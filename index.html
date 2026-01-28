@@ -2,190 +2,121 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Ma3lich Pay — Secure Checkout</title>
+  <title>Payment — Ma3lich</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <script async defer src="https://js.whop.com/static/checkout/loader.js"></script>
 
   <style>
     :root {
-      --bg: #0a0a0f;
-      --stripe-blue: #635bff;
-      --stripe-dark: #0a2540;
-      --text-main: #adbdcc;
-      --border-color: rgba(255, 255, 255, 0.1);
+      --bg-color: #f6f9fc; /* Stripe's signature light gray */
+      --text-color: #424770;
+      --header-bg: #ffffff;
     }
     
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif; }
+    * { 
+      box-sizing: border-box; 
+      -webkit-font-smoothing: antialiased;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+    }
     
     body {
       margin: 0;
       min-height: 100vh;
-      background-color: var(--bg);
-      background-image: 
-        radial-gradient(at 0% 0%, rgba(99, 91, 255, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 0%, rgba(0, 209, 255, 0.1) 0px, transparent 50%);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-      color: #fff;
-    }
-
-    /* Stripe-style Container */
-    .checkout-container {
-      position: relative;
-      width: min(1000px, calc(100% - 32px));
-      height: min(85vh, 800px);
-      background: #ffffff;
-      border-radius: 12px;
-      box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.5), 0 30px 60px -30px rgba(0, 0, 0, 0.5);
-      overflow: hidden;
+      background-color: var(--bg-color);
       display: flex;
       flex-direction: column;
-      animation: fadeIn 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+      align-items: center;
     }
 
-    @keyframes fadeIn {
-      from { transform: translateY(10px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* Header Styling */
-    .checkout-header {
-      padding: 20px 24px;
-      background: #ffffff;
+    /* Clean, Minimalist Header */
+    .stripe-header {
+      width: 100%;
+      height: 64px;
+      background: var(--header-bg);
       border-bottom: 1px solid #e6ebf1;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      z-index: 10;
+      padding: 0 40px;
+      position: fixed;
+      top: 0;
+      z-index: 100;
     }
 
-    .brand-section {
+    .logo {
+      font-weight: 700;
+      font-size: 19px;
+      color: #0a2540;
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+
+    /* Checkout Container - No heavy shadows, just clean elevation */
+    .checkout-wrapper {
+      margin-top: 100px; /* Space for fixed header */
+      width: min(1040px, calc(100% - 40px));
+      background: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 7px 14px 0 rgba(60,66,87, 0.08), 0 3px 6px 0 rgba(0,0,0, 0.12);
+      overflow: hidden;
+      min-height: 700px;
       display: flex;
       flex-direction: column;
     }
 
-    .brand-name {
-      color: var(--stripe-dark);
-      font-weight: 700;
-      font-size: 16px;
-      letter-spacing: -0.2px;
-    }
-
-    .secure-badge {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      color: #697386;
-      font-size: 13px;
-      margin-top: 2px;
-    }
-
-    .secure-icon {
-      width: 12px;
-      height: 12px;
-      fill: #697386;
-    }
-
     #whop-embedded-checkout {
       flex: 1;
-      min-height: 0;
-      overflow: auto;
       background: #ffffff;
     }
 
-    /* Re-open UI */
-    .reopen-overlay {
-      position: fixed;
-      inset: 0;
-      display: none;
-      background: var(--bg);
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      text-align: center;
-    }
-
-    .btn-primary {
-      background: var(--stripe-blue);
-      color: #fff;
-      border: none;
-      padding: 12px 24px;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
-    }
-
-    .btn-primary:hover {
-      background: #544af0;
-      transform: translateY(-1px);
-    }
-
-    .close-button {
-      background: none;
-      border: none;
+    /* Professional Footer */
+    .stripe-footer {
+      padding: 30px 0;
       color: #697386;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 8px;
-      transition: color 0.2s;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
     }
 
-    .close-button:hover { color: var(--stripe-dark); }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #24b47e; /* Stripe Green */
+      border-radius: 50%;
+    }
+
+    @media (max-width: 600px) {
+      .stripe-header { padding: 0 20px; }
+      .checkout-wrapper { margin-top: 80px; width: 100%; border-radius: 0; box-shadow: none; }
+    }
   </style>
 </head>
 
 <body>
 
-  <div class="checkout-container" id="checkoutPanel">
-    <div class="checkout-header">
-      <div class="brand-section">
-        <div class="brand-name">Ma3lich Pay</div>
-        <div class="secure-badge">
-          <svg class="secure-icon" viewBox="0 0 12 12"><path d="M6 1a3 3 0 0 0-3 3v1H2v6h8V5H9V4a3 3 0 0 0-3-3zm2 4H4V4a2 2 0 1 1 4 0v1z"/></svg>
-          Secure SSL Checkout
-        </div>
-      </div>
-      <button class="close-button" onclick="toggleCheckout(false)">✕</button>
+  <header class="stripe-header">
+    <a href="#" class="logo">Ma3lich</a>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #697386;">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 0 0-3 3v1H4v8h8V5h-1V4a3 3 0 0 0-3-3zM7 4a1 1 0 1 1 2 0v1H7V4z"/></svg>
+        Secure Payment
     </div>
+  </header>
 
+  <main class="checkout-wrapper">
     <div
       id="whop-embedded-checkout"
       data-whop-checkout-plan-id="plan_bjy3o9ZScfqmY"
     ></div>
-  </div>
+  </main>
 
-  <div id="reopenUI" class="reopen-overlay">
-    <div>
-      <h2 style="margin-bottom: 20px;">Ready to complete your purchase?</h2>
-      <button class="btn-primary" onclick="toggleCheckout(true)">Resume Payment</button>
-    </div>
-  </div>
-
-<script>
-  function toggleCheckout(show) {
-    const panel = document.getElementById("checkoutPanel");
-    const ui = document.getElementById("reopenUI");
-    
-    if(show) {
-      panel.style.display = "flex";
-      ui.style.display = "none";
-    } else {
-      panel.style.display = "none";
-      ui.style.display = "flex";
-    }
-  }
-
-  // Initial Check
-  window.addEventListener("load", () => {
-    toggleCheckout(true);
-  });
-</script>
+  <footer class="stripe-footer">
+    <div class="status-dot"></div>
+    <span>Systems Operational</span>
+    <span style="opacity: 0.5;">|</span>
+    <span>© Ma3lich</span>
+  </footer>
 
 </body>
 </html>
