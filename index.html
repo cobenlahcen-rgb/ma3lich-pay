@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ma3lich Pay — Secure Checkout</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Whop Embedded Checkout Loader -->
+  <script async defer src="https://js.whop.com/static/checkout/loader.js"></script>
+
+  <style>
+    :root{
+      --bg:#0a0a12;
+      --text:#f4f4ff;
+      --muted:#a1a1c8;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,Arial}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:
+        radial-gradient(900px 450px at 18% -8%,rgba(124,92,255,.25),transparent 60%),
+        radial-gradient(700px 380px at 85% 0%,rgba(74,222,128,.16),transparent 55%),
+        var(--bg);
+      color:var(--text);
+      overflow:hidden;
+    }
+
+    .reopen{
+      position:fixed;
+      left:50%;
+      top:50%;
+      transform:translate(-50%,-50%);
+      display:none;
+      padding:12px 16px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:900;
+      box-shadow:0 30px 90px rgba(0,0,0,.62);
+    }
+    .reopen small{display:block;color:var(--muted);font-weight:600;margin-top:4px}
+
+    .ng-modal{
+      position:fixed; inset:0;
+      display:none;
+      z-index:9999;
+    }
+    .ng-modal.is-open{display:block}
+
+    .ng-modal__backdrop{
+      position:absolute; inset:0;
+      background:rgba(0,0,0,.72);
+      backdrop-filter: blur(6px);
+    }
+
+    .ng-modal__panel{
+      position:relative;
+      width:min(980px, calc(100% - 16px));
+      height:min(86vh, 760px);
+      margin:8vh auto 0;
+      background:#0b0b0f;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      box-shadow:0 30px 90px rgba(0,0,0,.65);
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .ng-modal__header{
+      padding:12px 14px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0));
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+    }
+
+    .ng-modal__title{
+      font-weight:1000;
+      font-size:14px;
+      letter-spacing:-.2px;
+    }
+    .ng-modal__subtitle{
+      opacity:.75;
+      font-size:12px;
+      white-space:nowrap;
+    }
+
+    .ng-modal__close{
+      width:40px;height:40px;border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.06);
+      color:#fff;cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .ng-modal__close:hover{ background:rgba(255,255,255,.10); }
+
+    #whop-embedded-checkout{
+      flex:1;
+      min-height:0;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+      background:#fff;
+    }
+
+    .ng-modal__error{
+      position:absolute;
+      left:14px; right:14px; bottom:12px;
+      padding:10px 12px;
+      border-radius:12px;
+      background:rgba(255,0,0,.12);
+      border:1px solid rgba(255,0,0,.25);
+      font-size:13px;
+      color:rgba(255,255,255,.92);
+      display:none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="whopModal" class="ng-modal" aria-hidden="true">
+    <div class="ng-modal__backdrop" onclick="closeWhopModal()"></div>
+
+    <div class="ng-modal__panel" role="dialog" aria-modal="true" aria-label="Checkout">
+      <div class="ng-modal__header">
+        <div>
+          <div class="ng-modal__title">Ma3lich Pay — Secure Checkout</div>
+          <div class="ng-modal__subtitle">Paiement sécurisé · Support Ma3lich</div>
+        </div>
+        <button class="ng-modal__close" onclick="closeWhopModal()" aria-label="Close checkout">✕</button>
+      </div>
+
+      <div
+        id="whop-embedded-checkout"
+        data-whop-checkout-plan-id="plan_bjy3o9ZScfqmY"
+      ></div>
+
+      <div id="whopError" class="ng-modal__error">
+        Payment not completed. Please try again.
+      </div>
+    </div>
+  </div>
+
+  <button id="reopenBtn" class="reopen" onclick="openWhopModal()">
+    Re-open checkout
+    <small>You can continue your payment</small>
+  </button>
+
+<script>
+  const WHOP_PLAN_ID = "plan_bjy3o9ZScfqmY";
+
+  function openWhopModal(){
+    const modal = document.getElementById("whopModal");
+    const checkout = document.getElementById("whop-embedded-checkout");
+    const reopen = document.getElementById("reopenBtn");
+    const err = document.getElementById("whopError");
+
+    if (err) err.style.display = "none";
+    if (reopen) reopen.style.display = "none";
+
+    checkout.setAttribute("data-whop-checkout-plan-id", WHOP_PLAN_ID);
+
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeWhopModal(){
+    const modal = document.getElementById("whopModal");
+    const reopen = document.getElementById("reopenBtn");
+
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+
+    if (reopen) reopen.style.display = "block";
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeWhopModal();
+  });
+
+  window.addEventListener("load", () => {
+    openWhopModal();
+  });
+</script>
+
+</body>
+</html>
