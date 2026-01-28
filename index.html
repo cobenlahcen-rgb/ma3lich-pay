@@ -2,121 +2,177 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Payment — Ma3lich</title>
+  <title>Stripe Checkout — Ma3lich</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <script async defer src="https://js.whop.com/static/checkout/loader.js"></script>
 
   <style>
     :root {
-      --bg-color: #f6f9fc; /* Stripe's signature light gray */
-      --text-color: #424770;
-      --header-bg: #ffffff;
+      --stripe-blue: #635bff;
+      --stripe-dark: #0a2540;
+      --stripe-gray: #f6f9fc;
+      --text-muted: #697386;
     }
     
     * { 
       box-sizing: border-box; 
       -webkit-font-smoothing: antialiased;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
     }
     
     body {
       margin: 0;
       min-height: 100vh;
-      background-color: var(--bg-color);
+      background-color: #ffffff;
       display: flex;
-      flex-direction: column;
+      justify-content: center;
       align-items: center;
     }
 
-    /* Clean, Minimalist Header */
-    .stripe-header {
-      width: 100%;
-      height: 64px;
-      background: var(--header-bg);
-      border-bottom: 1px solid #e6ebf1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
+    /* Full-screen Stripe Background Split */
+    .stripe-background {
       position: fixed;
-      top: 0;
-      z-index: 100;
+      inset: 0;
+      display: flex;
+      z-index: -1;
     }
 
-    .logo {
-      font-weight: 700;
-      font-size: 19px;
-      color: #0a2540;
-      letter-spacing: -0.5px;
-      text-decoration: none;
+    .bg-left {
+      flex: 1;
+      background-color: var(--stripe-gray);
     }
 
-    /* Checkout Container - No heavy shadows, just clean elevation */
-    .checkout-wrapper {
-      margin-top: 100px; /* Space for fixed header */
-      width: min(1040px, calc(100% - 40px));
-      background: #ffffff;
-      border-radius: 8px;
-      box-shadow: 0 7px 14px 0 rgba(60,66,87, 0.08), 0 3px 6px 0 rgba(0,0,0, 0.12);
-      overflow: hidden;
-      min-height: 700px;
+    .bg-right {
+      flex: 1;
+      background-color: #ffffff;
+    }
+
+    /* Main Checkout Container */
+    .checkout-container {
+      width: 100%;
+      max-width: 1080px;
+      height: 100vh;
+      display: flex;
+      flex-direction: row;
+      background: transparent;
+    }
+
+    /* Left Side: Product Info (The "Stripe" Look) */
+    .product-sidebar {
+      flex: 1;
+      padding: 80px 48px;
       display: flex;
       flex-direction: column;
+      background-color: var(--stripe-gray);
+    }
+
+    .back-btn {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 40px;
+    }
+
+    .merchant-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .product-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--stripe-dark);
+      margin: 0 0 12px 0;
+    }
+
+    .price-display {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--stripe-dark);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .price-currency { font-size: 20px; font-weight: 500; color: var(--text-muted); }
+
+    /* Right Side: Payment Form (Whop Container) */
+    .payment-main {
+      flex: 1;
+      padding: 80px 48px;
+      background-color: #ffffff;
+      overflow-y: auto;
     }
 
     #whop-embedded-checkout {
-      flex: 1;
-      background: #ffffff;
+      width: 100%;
     }
 
-    /* Professional Footer */
+    /* Stripe Branding Footer */
     .stripe-footer {
-      padding: 30px 0;
-      color: #697386;
-      font-size: 14px;
+      position: absolute;
+      bottom: 32px;
       display: flex;
       align-items: center;
-      gap: 15px;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 500;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      background: #24b47e; /* Stripe Green */
-      border-radius: 50%;
+    .stripe-logo-icon {
+      fill: var(--text-muted);
+      height: 18px;
     }
 
-    @media (max-width: 600px) {
-      .stripe-header { padding: 0 20px; }
-      .checkout-wrapper { margin-top: 80px; width: 100%; border-radius: 0; box-shadow: none; }
+    @media (max-width: 850px) {
+      .checkout-container { flex-direction: column; height: auto; }
+      .product-sidebar { padding: 40px 24px; }
+      .payment-main { padding: 40px 24px; }
+      .stripe-background { display: none; }
+      body { background-color: var(--stripe-gray); }
     }
   </style>
 </head>
 
 <body>
 
-  <header class="stripe-header">
-    <a href="#" class="logo">Ma3lich</a>
-    <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #697386;">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a3 3 0 0 0-3 3v1H4v8h8V5h-1V4a3 3 0 0 0-3-3zM7 4a1 1 0 1 1 2 0v1H7V4z"/></svg>
-        Secure Payment
-    </div>
-  </header>
+  <div class="stripe-background">
+    <div class="bg-left"></div>
+    <div class="bg-right"></div>
+  </div>
 
-  <main class="checkout-wrapper">
-    <div
-      id="whop-embedded-checkout"
-      data-whop-checkout-plan-id="plan_bjy3o9ZScfqmY"
-    ></div>
+  <main class="checkout-container">
+    <section class="product-sidebar">
+      <a href="https://ma3lich.com" class="back-btn">
+        <svg width="16" height="16" viewBox="0 0 16 16"><path fill="currentColor" d="M11.5 14a.5.5 0 0 1-.354-.854L6.293 8.293a1 1 0 0 1 0-1.414l4.853-4.854a.5.5 0 1 1 .708.708L7.354 7.293a.5.5 0 0 0 0 .707l4.5 4.5A.5.5 0 0 1 11.5 14z"/></svg>
+        Back to Ma3lich
+      </a>
+
+      <div class="merchant-name">Ma3lich</div>
+      <h1 class="product-title">IPTV Pro Setup</h1>
+      
+      <div class="price-display">
+        300.00 <span class="price-currency">MAD</span>
+      </div>
+
+      <div class="stripe-footer">
+        Powered by 
+        <svg class="stripe-logo-icon" viewBox="0 0 40 16"><path d="M36.4 7.2c0-2.4-1.2-3.8-3.5-3.8-2.3 0-3.6 1.4-3.6 3.8 0 2.8 1.5 3.9 3.8 3.9.9 0 1.8-.2 2.5-.5v-1.7c-.6.3-1.4.5-2.2.5-1.1 0-2-.4-2-1.8h6.4c.1-.1.1-.3.1-.4zm-5.1-1.3c0-.9.6-1.3 1.5-1.3s1.5.4 1.5 1.3h-3zm-9.3-2.1c-.6 0-1.1.3-1.4.7V3.5h-1.9v10.1l2-.4V9.6c.3.5.9.8 1.6.8 1.5 0 2.7-1.3 2.7-3.6 0-2.3-1.3-3.4-3-3.4zm-.4 5.3c-.8 0-1.3-.6-1.3-1.7s.5-1.7 1.3-1.7 1.3.6 1.3 1.7-.5 1.7-1.3 1.7zm-6.4-5.3c-.7 0-1.2.3-1.6.8V.4l-2 .4v12.7l2-.4V8.4c.4-.5.9-.8 1.6-.8 1.4 0 2.5 1.2 2.5 3.5 0 2.3-1.2 3.4-2.8 3.4s-1.1-.3-1.4-.7V14l1.9-.4V3.5h-1.9v10.1l2-.4V9.6c.3.5.9.8 1.6.8 1.5 0 2.7-1.3 2.7-3.6 0-2.3-1.3-3.4-3-3.4zm-.4 5.3c-.8 0-1.3-.6-1.3-1.7s.5-1.7 1.3-1.7 1.3.6 1.3 1.7-.5 1.7-1.3 1.7zm-9.7-5.3c-.8 0-1.4.3-1.8.8V3.5H2v10.1l2-.4V7.2c0-1.1.7-1.8 1.7-1.8.3 0 .5.1.7.1V3.6c-.3-.1-.5-.2-.8-.2zM.4 5.1h1.9V3.5H.4v1.6z"/></svg>
+      </div>
+    </section>
+
+    <section class="payment-main">
+      <div id="whop-embedded-checkout" data-whop-checkout-plan-id="plan_bjy3o9ZScfqmY"></div>
+    </section>
   </main>
-
-  <footer class="stripe-footer">
-    <div class="status-dot"></div>
-    <span>Systems Operational</span>
-    <span style="opacity: 0.5;">|</span>
-    <span>© Ma3lich</span>
-  </footer>
 
 </body>
 </html>
